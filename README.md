@@ -4,7 +4,9 @@ Windows 下的 UniVPN 原生多实例实验脚本。把一个脚本放到官方�
 
 **目前只支持 UniVPN `10781.19.0.1214` 的指定构建。** 相同版本号不代表文件相同；脚本会校验三个 EXE 的 SHA256，不匹配即停止。项目不包含厂商程序、驱动、账号或 VPN 配置。
 
-## 使用
+官方客户端的版本与下载入口：[联软 UniVPN 下载页面](https://www.leagsoft.com/doc/article/103107.html)。请安装上述受支持构建；下载页面中的其他版本不保证兼容。
+
+## 安装与使用
 
 1. 下载仓库根目录的 **`UniVPN-Multi.ps1`**，放到官方安装目录，与 `UniVPN.exe` 放在一起。使用整个仓库时，仍然只需复制这一个文件。
 2. 断开 VPN，并从系统托盘**彻底退出原版和所有副本**。只关闭窗口可能仍在后台运行。
@@ -30,6 +32,32 @@ C:\Program Files (x86)\
 **打开已有实例**：双击对应目录里的 `Open-UniVPN编号.cmd`，不新增网卡，允许与其他客户端同时运行。已有窗口隐藏时，从托盘打开。
 
 不要移动原脚本、重命名实例目录或删除 `.univpn-multi`，生成的启动入口和服务会依赖这些位置。原版安装文件不会被修改；原版用户的账号密码不会复制到副本。新增服务为手动启动，不设置开机自动连接。
+
+## 卸载
+
+以下以卸载自动生成的 `UniVPN2` 为例；第 3 实例对应 `UniVPN3`、`UVP003Service`、`UVP003`，以此类推。
+
+1. 在目标副本中断开 VPN，并从系统托盘彻底退出。
+2. 在开始菜单找到 PowerShell，右键选择**“以管理员身份运行”**。先检查服务的实际路径：
+
+   ```powershell
+   Get-CimInstance Win32_Service -Filter "Name='UVP002Service'" |
+       Select-Object Name, State, PathName
+   ```
+
+   确认路径指向原安装目录下的 `.univpn-multi\UVP002\promote\UVP002PromoteService.exe` 后，停止并删除该服务：
+
+   ```powershell
+   Stop-Service -Name UVP002Service
+   sc.exe delete UVP002Service
+   ```
+
+3. 等待服务删除、相关进程退出后，在资源管理器中删除副本目录，例如 `C:\Program Files (x86)\UniVPN2`。若不再保留登录配置，可删除 `%APPDATA%\UVP002`。
+4. 如需移除专用网卡，先退出**所有 UniVPN 客户端**。查看原安装目录 `.univpn-multi\instance-002.json` 的 `TapGuid`，核对目标网卡后再通过设备管理器卸载。删除 TAP 可能影响共享驱动；无法确认归属时先保留网卡。不要执行 `tapinstall remove tap0901`，它会匹配多张网卡。
+
+**不要删除原版的 `UniVPNService`，也不要使用官方卸载程序移除副本**，以免影响原版和共享组件。早期手工创建的 `UniVP2` 使用 `UniVP2Service`，与自动生成的 `UniVPN2` 不同，操作前务必核对实际路径。
+
+`.univpn-multi` 中的实例 JSON 可保留作记录和编号占位；不要删除整个目录，其中可能仍有其他实例依赖的目录联接。更多细节见[维护与移除说明](docs/MAINTENANCE.md)。
 
 ## 要求和当前验证范围
 
