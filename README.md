@@ -2,6 +2,9 @@
 
 Windows 下的 UniVPN 原生多实例实验脚本。把一个脚本放到官方客户端根目录，每次运行自动新增一张 TAP 网卡，并生成下一套 `UniVPN2`、`UniVPN3`……客户端。
 
+<img width="1239" height="721" alt="image" src="https://github.com/user-attachments/assets/a538e431-7995-4666-9718-28130ecb4512" />
+
+
 **目前只支持 UniVPN `10781.19.0.1214` 的指定构建。** 相同版本号不代表文件相同；脚本会校验三个 EXE 的 SHA256，不匹配即停止。项目不包含厂商程序、驱动、账号或 VPN 配置。
 
 官方客户端的版本与下载入口：[联软 UniVPN 下载页面](https://www.leagsoft.com/doc/article/103107.html)。请安装上述受支持构建；下载页面中的其他版本不保证兼容。
