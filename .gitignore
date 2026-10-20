@@ -1,0 +1,29 @@
+# Never distribute installed or patched vendor binaries.
+*.exe
+*.dll
+*.sys
+*.cat
+*.inf
+*.zip
+
+# Local experiments, machine state, and credentials.
+.univpn-multi/
+prepared*/
+verification-*/
+offline-verification/
+candidate-*/
+*.log
+*.ini
+verification.json
+elevation-result.json
+instance-*.json
+tap-*.log
+
+# Local tools and editor files.
+.venv/
+__pycache__/
+.vscode/
+.idea/
+*.tmp
+.DS_Store
+Thumbs.db

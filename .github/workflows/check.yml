@@ -1,0 +1,24 @@
+name: Check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        shell: [powershell, pwsh]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check generated script
+        shell: ${{ matrix.shell }}
+        run: ./tools/Build.ps1 -Check
+      - name: Offline tests (no VPN installation required)
+        shell: ${{ matrix.shell }}
+        run: ./tests/RunTests.ps1
