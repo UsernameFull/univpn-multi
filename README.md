@@ -16,6 +16,12 @@ Windows 下的 UniVPN 原生多实例实验脚本。把一个脚本放到官方�
 3. 右键脚本，选择“使用 PowerShell 运行”，允许管理员 UAC 提示。
 4. 等待生成并打开新的客户端，然后手动添加网关、登录。
 
+如果系统提示脚本未进行数字签名，可在官方安装目录的 PowerShell 窗口中执行以下命令；执行策略仅对本次启动生效：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\UniVPN-Multi.ps1
+```
+
 检测到原版、任一副本、连接后台或已启用的 TAP 连接时，会弹窗提示退出并停止，**不会自动关闭客户端**。官方常驻服务无需手动停止。
 
 默认安装时的文件结构：

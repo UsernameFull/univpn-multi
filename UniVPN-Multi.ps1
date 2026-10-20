@@ -17,10 +17,13 @@ Override the original installation directory. Defaults to the script directory.
 param(
     [int]$OpenInstance = 0,
     [switch]$SelfTest,
-    [string]$SourceDirectory = $PSScriptRoot
+    [string]$SourceDirectory
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
+# Windows PowerShell 5.1 -File can evaluate parameter defaults before
+# $PSScriptRoot is populated. Resolve the default in the script body instead.
+if(-not $PSBoundParameters.ContainsKey('SourceDirectory')){$SourceDirectory=$PSScriptRoot}
 $source=[IO.Path]::GetFullPath($SourceDirectory).TrimEnd('\')
 $scriptFile=$PSCommandPath
 $parent=[IO.Path]::GetDirectoryName($source)

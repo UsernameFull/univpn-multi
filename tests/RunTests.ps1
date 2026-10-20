@@ -37,6 +37,26 @@ Assert-Throws { [UniVpnMulti.BinaryPatch]::PatchInstance([byte[]]@(),0,$fixtureG
 $tokens = $null
 $errors = $null
 $ast = [Management.Automation.Language.Parser]::ParseFile((Join-Path $root 'src\Runtime.ps1'),[ref]$tokens,[ref]$errors)
+# Exercise the actual startup code through -File in a fresh shell. In Windows
+# PowerShell 5.1, $PSScriptRoot may be empty during parameter default evaluation.
+# Only copy initialization: no patch engine, services, adapters, or entry point.
+$firstFunction = $ast.Find({param($item) $item -is [Management.Automation.Language.FunctionDefinitionAst]},$true)
+$probeDirectory = Join-Path ([IO.Path]::GetTempPath()) ('UniVPN startup ' + [guid]::NewGuid().ToString('N'))
+$probeFile = Join-Path $probeDirectory 'startup.ps1'
+$shellName = if ($PSVersionTable.PSEdition -eq 'Core') { 'pwsh.exe' } else { 'powershell.exe' }
+try {
+    $null = New-Item -ItemType Directory -Path $probeDirectory
+    $startup = $ast.Extent.Text.Substring(0,$firstFunction.Extent.StartOffset)
+    [IO.File]::WriteAllText($probeFile,($startup + "`nWrite-Output `$source`n"),[Text.UTF8Encoding]::new($true))
+    $defaultOutput = & (Join-Path $PSHOME $shellName) -NoProfile -ExecutionPolicy Bypass -File $probeFile
+    Assert-True ($LASTEXITCODE -eq 0 -and $defaultOutput -eq $probeDirectory) 'File launch defaults to script directory with spaces'
+    $explicitOutput = & (Join-Path $PSHOME $shellName) -NoProfile -ExecutionPolicy Bypass -File $probeFile -SourceDirectory $root
+    Assert-True ($LASTEXITCODE -eq 0 -and $explicitOutput -eq $root) 'File launch preserves explicit source directory'
+} finally {
+    # Remove only the known probe file and its now-empty temporary directory.
+    if ([IO.File]::Exists($probeFile)) { [IO.File]::Delete($probeFile) }
+    if ([IO.Directory]::Exists($probeDirectory)) { [IO.Directory]::Delete($probeDirectory) }
+}
 foreach ($name in @('Get-InstanceInfo','Get-NextNumber','Assert-NoRunningClients','Assert-ServiceOwner')) {
     $node = $ast.Find({param($item) $item -is [Management.Automation.Language.FunctionDefinitionAst] -and $item.Name -eq $name},$true)
     if (-not $node) { throw "Missing runtime function $name" }
