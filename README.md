@@ -9,6 +9,8 @@ Windows 下的 UniVPN 原生多实例实验脚本。把一个脚本放到官方�
 
 官方客户端的版本与下载入口：[联软 UniVPN 下载页面](https://www.leagsoft.com/doc/article/103107.html)。请安装上述受支持构建；下载页面中的其他版本不保证兼容。
 
+如需为另一个**精确构建**重新分析和生成 profile，可参考 [`skills/univpn-multi-adapter`](skills/univpn-multi-adapter/SKILL.md)。该流程只做逐构建验证，不能把版本号或哈希校验放宽成通用兼容。
+
 ## 安装与使用
 
 1. 下载仓库根目录的 **`UniVPN-Multi.ps1`**，放到官方安装目录，与 `UniVPN.exe` 放在一起。使用整个仓库时，仍然只需复制这一个文件。
